@@ -15,22 +15,23 @@ from influxdb import InfluxDBClient
 import time
 
 INFLUXDB_ADDRESS = 'influxdb'
-INFLUXDB_USER = 'root'
-INFLUXDB_PASSWORD = 'root'
-INFLUXDB_DATABASE = 'iothon_db'
+INFLUXDB_USER = 'mqtt'
+INFLUXDB_PASSWORD = 'mqtt'
+INFLUXDB_DATABASE = 'smartlab'
 
 MQTT_ADDRESS = 'mosquitto'
 MQTT_USER = 'mqttuser'
 MQTT_PASSWORD = 'mqttpassword'
-MQTT_TOPIC = 'iothon/+/+'  # [bme280|mijia]/[temperature|humidity|battery|status]
-MQTT_REGEX = 'iothon/([^/]+)/([^/]+)'
+MQTT_TOPIC = '+/+/+'  # [bme280|mijia]/[temperature|humidity|battery|status]
+MQTT_REGEX = '([^/]+)/([^/]+)/([^/]+)'
 MQTT_CLIENT_ID = 'MQTTInfluxDBBridge'
 
-influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
+influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD)
 
 
 class SensorData(NamedTuple):
-    location: str
+    experiment: str
+    device: str
     measurement: str
     value: float
 
@@ -45,20 +46,17 @@ def on_message(client, userdata, msg):
     """The callback for when a PUBLISH message is received from the server."""
     print(msg.topic + ' ' + str(msg.payload))
     sensor_data = _parse_mqtt_message(msg.topic, msg.payload.decode('utf-8'))
-    if sensor_data is not None:
-        _send_sensor_data_to_influxdb(sensor_data)
+    _send_sensor_data_to_influxdb(sensor_data)
+    print(sensor_data)
 
 
 def _parse_mqtt_message(topic, payload):
     match = re.match(MQTT_REGEX, topic)
-    if match:
-        location = match.group(1)
-        measurement = match.group(2)
-        if measurement == 'status':
-            return None
-        return SensorData(location, measurement, float(payload))
-    else:
-        return None
+
+    experiment = match.group(1)
+    device = match.group(2)
+    measurement = match.group(3)
+    return SensorData(experiment, device, measurement, float(payload))
 
 
 def _send_sensor_data_to_influxdb(sensor_data):
@@ -66,7 +64,8 @@ def _send_sensor_data_to_influxdb(sensor_data):
         {
             'measurement': sensor_data.measurement,
             'tags': {
-                'location': sensor_data.location
+                'experiment': sensor_data.experiment,
+                'device': sensor_data.device
             },
             'fields': {
                 'value': sensor_data.value
