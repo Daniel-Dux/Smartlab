@@ -122,7 +122,7 @@ You can follow the [official instructions](https://docs.docker.com/install/linux
 
 For the IoThon Ubuntu default VM, just give the following command:
 ```sh
-   sudo usermod -aG docker iothon
+   sudo usermod -aG docker user
 ```
 
 Log out from your SSH session (or terminal) and log in again (or open new terminal).
@@ -177,6 +177,23 @@ log in to and configure Grafana, and how to get the data flowing.
 The Mosquitto username and passwords are `mqttuser` and `mqttpassword`.
 To change these, see the **Optional: Update mosquitto credentials** section below.
 
+## Create InfluxDB database
+
+Start InfluxDB using
+```sh
+    influx
+```
+Create the database
+```sh
+    CREATE DATABASE smartlab
+```
+Create a user and grant all permissions on database
+Create the database
+```sh
+    CREATE USER mqtt WITH PASSWORD ‘mqtt’
+    GRANT ALL ON weather_stations TO mqtt
+```
+
 ## Grafana setup
 
 It is a good idea to log in your Grafana right away and change your
@@ -190,7 +207,7 @@ data to your InfluxDB database.
 - Add data source (InfluxDB)
   - Name: `InfluxDB`
   - URL: `http://influxdb:8086`
-  - Database: `iothon_db`
+  - Database: `smartlab`
   - User: `root`
   - Password: `root`
   - Save & Test
@@ -215,8 +232,8 @@ are more experienced, you can also
 [use GCC and a flasher directly](03-arduino_mqtt/Using-GCC.md).
 
 Sensors should send data to the mosquitto broker to the following MQTT topic:
-`iothon/{peripheralName}/{sensorname}`.
-For example: `iothon/mkrnb1500/temperature`.
+`{experiment}/{peripheralName}/{sensorname}`.
+For example: `altes/mkrnb1500/temperature`.
 
 Arduino sketches for the MKR NB 1500 are provided to in `03-arduino_mqtt`.
 See the `README.md` [file there](03-arduino_mqtt/README.md).
@@ -257,7 +274,7 @@ MQTT bridge logs:
    docker logs mqttbridge
 ```
 
-To enter some data, Connect, and Publish, e.g. at `iothon/testing/temperature`.
+To enter some data, Connect, and Publish, e.g. at `altes/testing/temperature`.
 
 ## Optional: Update mosquitto credentials
 
