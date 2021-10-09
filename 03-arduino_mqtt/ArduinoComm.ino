@@ -9,8 +9,8 @@ void subscribeReceive(char* topic, byte* payload, unsigned int length);
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x10, 0x05, 0x1F };
 IPAddress ip(196, 168, 178, 71);
 
-// Set yout toppic here
-const char* toppic = "altes/test/arduino"
+// Set yout topic here
+const char* topic = "altes/test/arduino"
 
 // Make sure to leave out the http and slashes!
 const char* server = "147.142.19.112";
@@ -56,7 +56,7 @@ void loop()
   // mqttClient.subscribe("altes/test/arduino");
 
   // Attempt to publish a value to the topic "MakerIOTopic"
-  if(mqttClient.publish(toppic, "10"))
+  if(mqttClient.publish(topic, "10"))
   {
     Serial.println("Publish message success");
   }
