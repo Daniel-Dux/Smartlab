@@ -9,8 +9,8 @@ services:
     volumes:
       - ../01-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ../01-mosquitto/users:/mosquitto/config/users
-      - ${DATA_DIR}/mosquitto/data:/mosquitto/data
-      - ${DATA_DIR}/mosquitto/log:/mosquitto/log
+      - /home/dux/Smartlab/data/mosquitto/data:/mosquitto/data
+      - /home/dux/Smartlab/data/mosquitto/log:/mosquitto/log
     restart: always
 
   influxdb:
@@ -19,23 +19,31 @@ services:
     ports:
       - 8086:8086
     volumes:
-      - ${DATA_DIR}/influxdb:/var/lib/influxdb
+      - /home/dux/Smartlab/data/influxdb:/var/lib/influxdb
     restart: always
 
   grafana:
-    image: grafana/grafana:5.4.3
+    image: grafana/grafana:8.2.0
     container_name: grafana
     depends_on:
       - influxdb
     ports:
       - 3000:3000
     volumes:
-      - ${DATA_DIR}/grafana:/var/lib/grafana
+      - /home/dux/Smartlab/data/grafana:/var/lib/grafana
+    environment:
+      - GF_SERVER_ROOT_URL=http://147.142.19.112:3000/
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp.gmail.com:587
+      - GF_SMTP_USER=ultracold.smartlab@gmail.com
+      - GF_SMTP_FROM_ADDRESS=ultracold.smartlab@gmail.com
+      - GF_SMTP_PASSWORD=9s9*NzTWDUfl
+      - GF_RENDERING_CALLBACK_URL=http://147.142.19.112:3000/
     restart: always
 
   mqttbridge:
     build: ../02-bridge
-    image: iothon/mqttbridge
+    image: iotohn/mqttbridge
     container_name: mqttbridge
     depends_on:
       - mosquitto
