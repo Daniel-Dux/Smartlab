@@ -14,12 +14,7 @@ The present repository has been adapted for the
 [IoThon 2019](https://iothon.io) hackathon,
 and is considerably different from Gautier Mechling's original one.
 
-For connecting your IoT device to the cloud, and then your front end,
-the overall network structure looks like the following:
-
-![5G connectivity](images/5G-connectivity.png)
-
-Your Arduino will be communicating over the 5G network with you server
+Your Arduino will be communicating over ethernet with you server
 (denoteted as `User VM` in the figure), which runs some suitable software
 to communicate with the Arduino, to store any needed data, and to provide
 a user interface.
@@ -27,7 +22,7 @@ a user interface.
 The default instructions below explain how to install and test the presented
 approach using two computers:
 
-1. A *laptop* (or similar) used to program the Arduino MKR NB 1500
+1. A *laptop* (or similar) used to program the Arduino
 2. A *server* (or similar) running an MQTT server, InfluxDB database,
    and Grafana data visualisation.
 
@@ -191,7 +186,7 @@ Create a user and grant all permissions on database
 Create the database
 ```sh
     CREATE USER mqtt WITH PASSWORD ‘mqtt’
-    GRANT ALL ON weather_stations TO mqtt
+    GRANT ALL ON smartlab TO mqtt
 ```
 
 ## Grafana setup
@@ -227,27 +222,15 @@ data to your InfluxDB database.
 ## Programming the sensor(s) with your *laptop*
 
 For programming your sensors, the easiest way is to use the
-[Arduino IDE](https://www.arduino.cc/en/Main/Software).  If you
-are more experienced, you can also
-[use GCC and a flasher directly](03-arduino_mqtt/Using-GCC.md).
+[Arduino IDE](https://www.arduino.cc/en/Main/Software).
 
 Sensors should send data to the mosquitto broker to the following MQTT topic:
 `{experiment}/{peripheralName}/{sensorname}`.
 For example: `altes/mkrnb1500/temperature`.
 
-Arduino sketches for the MKR NB 1500 are provided to in `03-arduino_mqtt`.
-See the `README.md` [file there](03-arduino_mqtt/README.md).
+Arduino sketches are provided to in `03-arduino_mqtt`.
 
 Before flashing, you need to change the `MQTT_SERVER` constant to MQTT *server* IP address.
-
-**NOTE!** If you are using an Aalto/COMNET SIM, the server IP address needs to be
-an inner private address, e.g. `10.200.1.100.`  If you are using a normal SIM from
-a commercial vendor, the server IP address needs to be its public IP address in
-the global network.
-
-For using any interesting sensors, you will need to modify the sketch to
-use a suitable sensor driver to fetch the data from the sensor and to pass
-it via MQTT to your server.
 
 ## Testing MQTT without a sensor
 
@@ -301,9 +284,6 @@ For visualising it, see the [Grafana](#Grafana_setup) instructions above.
 Once you have your data being visualised, you are on your own to innovate.
 
 ## Next steps
-
-For hints what you can do with the Arduino, see the
-[README](03-arduino_mqtt/README.md) for the MKR NB 1500 sketch.
 
 For the cloud, you are more or less on our own.  Good starting
 points for potentially problematic parts are the following:
