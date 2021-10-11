@@ -39,6 +39,7 @@ services:
       - GF_SMTP_FROM_ADDRESS=ultracold.smartlab@gmail.com
       - GF_SMTP_PASSWORD=9s9*NzTWDUfl
       - GF_RENDERING_CALLBACK_URL=http://147.142.19.112:3000/
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=1ms
     restart: always
 
   mqttbridge:
